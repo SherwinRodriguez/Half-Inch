@@ -42,7 +42,7 @@ export default function PoolDetailPage() {
   const { data: poolData, isLoading: poolLoading, error: poolError, refetch: refetchPool } = useQuery({
     queryKey: ['pool', address],
     queryFn: async () => {
-      const response = await fetch(`/api/pools/status?address=${address}&detailed=true&timeframe=${timeframe}`);
+      const response = await fetch(`/api/pools/blockchain-status?detailed=true&timeframe=${timeframe}`);
       if (!response.ok) {
         throw new Error('Failed to fetch pool data');
       }
@@ -56,7 +56,7 @@ export default function PoolDetailPage() {
   const { data: metricsData, isLoading: metricsLoading, error: metricsError } = useQuery({
     queryKey: ['pool-metrics', address, timeframe],
     queryFn: async () => {
-      const response = await fetch(`/api/pools/${address}/metrics?timeframe=${timeframe}`);
+      const response = await fetch(`/api/pools/blockchain-metrics/${address}?timeframe=${timeframe}`);
       if (!response.ok) {
         throw new Error('Failed to fetch pool metrics');
       }

@@ -279,6 +279,11 @@ export function formatAddress(address: string): string {
 }
 
 export function formatNumber(value: number, decimals: number = 2): string {
+  // Handle null, undefined, or invalid inputs
+  if (value === null || value === undefined || isNaN(value) || !isFinite(value)) {
+    return '0.00';
+  }
+  
   if (value >= 1e9) {
     return `${(value / 1e9).toFixed(decimals)}B`;
   } else if (value >= 1e6) {

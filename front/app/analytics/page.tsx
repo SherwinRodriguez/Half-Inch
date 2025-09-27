@@ -30,7 +30,7 @@ export default function AnalyticsPage() {
   const { data: analyticsData, isLoading, error, refetch } = useQuery({
     queryKey: ['analytics', timeframe],
     queryFn: async () => {
-      const response = await fetch(`/api/pools/status?detailed=true&timeframe=${timeframe}`);
+      const response = await fetch(`/api/pools/blockchain-status?detailed=true&timeframe=${timeframe}`);
       if (!response.ok) {
         throw new Error('Failed to fetch analytics data');
       }

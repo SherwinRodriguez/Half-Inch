@@ -33,7 +33,7 @@ export default function RebalancePage() {
   const { data: poolsData, isLoading, error, refetch } = useQuery({
     queryKey: ['pools', 'rebalance'],
     queryFn: async () => {
-      const response = await fetch('/api/pools/status?detailed=true&timeframe=24h');
+      const response = await fetch('/api/pools/blockchain-status?detailed=true&timeframe=24h');
       if (!response.ok) {
         throw new Error('Failed to fetch pools data');
       }

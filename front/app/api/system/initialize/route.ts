@@ -124,16 +124,15 @@ export async function POST(request: NextRequest) {
       database.addRebalanceEvent(rebalanceEvent);
     });
     
-    // Initialize pool monitoring
-    const allPairsLength = await factoryContract.allPairsLength();
-    console.log(`Found ${allPairsLength} existing pairs`);
+    // Initialize pool monitoring - use manual discovery instead of allPairsLength
+    console.log('Starting manual pool discovery for initialization...');
     
     // Store system status
     const systemStatus: SystemStatus = {
       isInitialized: true,
       contractsDeployed: true,
       eventListenersActive: true,
-      totalPools: Number(allPairsLength),
+      totalPools: 0, // Will be updated by discovery
       activeRebalances: 0,
       lastUpdate: Date.now(),
       networkId: 31, // Rootstock testnet
@@ -163,6 +162,28 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    console.log('🔄 System initialization check...');
+    
+    // Check if we have pools in the database
+    const existingPools = database.getAllPools();
+    let needsDiscovery = existingPools.length === 0;
+    
+    if (needsDiscovery) {
+      console.log('🔍 No pools found, triggering automatic discovery...');
+      
+      try {
+        // Trigger pool discovery
+        const discoveryResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/pools/discover`);
+        const discoveryData = await discoveryResponse.json();
+        
+        if (discoveryData.success && discoveryData.data.pools) {
+          console.log(`✅ Auto-discovery found ${discoveryData.data.totalDiscovered} pools`);
+        }
+      } catch (discoveryError) {
+        console.warn('⚠️  Auto-discovery failed:', discoveryError);
+      }
+    }
+    
     // Return current system status
     const stats = database.getDashboardStats();
     
@@ -170,7 +191,7 @@ export async function GET(request: NextRequest) {
       isInitialized: true,
       contractsDeployed: true,
       eventListenersActive: true,
-      totalPools: stats.activePools,
+      totalPools: stats.totalPools,
       activeRebalances: stats.imbalancedPools,
       lastUpdate: Date.now(),
       networkId: 31,

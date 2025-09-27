@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
         
         // Test the connection with a simple call
         const testFactory = await contractService.getFactoryContract(factoryAddress);
-        const testLength = await Promise.race([
-          testFactory.allPairsLength(),
+        const testCall = await Promise.race([
+          testFactory.feeTo(),
           new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
         ]);
         
@@ -92,14 +92,22 @@ export async function GET(request: NextRequest) {
           pairContract.totalSupply()
         ]);
         
-        // Get token symbols
+        // Get token symbols with error handling
         const token0Contract = await contractService.getERC20Contract(token0Address);
         const token1Contract = await contractService.getERC20Contract(token1Address);
         
-        const [token0Symbol, token1Symbol] = await Promise.all([
-          token0Contract.symbol(),
-          token1Contract.symbol()
-        ]);
+        let token0Symbol, token1Symbol;
+        try {
+          token0Symbol = await token0Contract.symbol().catch(() => `Token0_${token0Address.slice(0, 8)}`);
+        } catch (error) {
+          token0Symbol = `Token0_${token0Address.slice(0, 8)}`;
+        }
+        
+        try {
+          token1Symbol = await token1Contract.symbol().catch(() => `Token1_${token1Address.slice(0, 8)}`);
+        } catch (error) {
+          token1Symbol = `Token1_${token1Address.slice(0, 8)}`;
+        }
         
         // Calculate metrics
         const ratio = calculateRatio(reserve0.toString(), reserve1.toString());
@@ -136,7 +144,9 @@ export async function GET(request: NextRequest) {
         discoveredPools.push(pool);
         
         // Register pool in database
+        console.log(`📝 Adding pool to database: ${pairAddress}`);
         database.addPool(pool);
+        console.log(`✅ Pool added. Total pools in database: ${database.getAllPools().length}`);
         
         // Initialize pool metrics if not exists
         if (!database.getPoolMetrics(pairAddress)) {

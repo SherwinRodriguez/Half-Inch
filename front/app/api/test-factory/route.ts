@@ -29,9 +29,9 @@ export async function GET(request: NextRequest) {
         
         const factoryContract = await contractService.getFactoryContract(factoryAddress);
         
-        // Simple test call with timeout
-        const allPairsLength = await Promise.race([
-          factoryContract.allPairsLength(),
+        // Simple test call with timeout - use feeTo instead of allPairsLength
+        const feeToAddress = await Promise.race([
+          factoryContract.feeTo(),
           new Promise((_, reject) => 
             setTimeout(() => reject(new Error('Connection timeout after 15 seconds')), 15000)
           )
@@ -42,20 +42,19 @@ export async function GET(request: NextRequest) {
         
         console.log(`✅ ${endpoint.name} SUCCESS:`);
         console.log(`   Response time: ${responseTime}ms`);
-        console.log(`   Total pairs: ${allPairsLength}`);
+        console.log(`   Fee to address: ${feeToAddress}`);
         
         results.push({
           name: endpoint.name,
           url: endpoint.url,
           success: true,
           responseTime,
-          totalPairs: allPairsLength.toString(),
+          feeToAddress: feeToAddress,
           error: null
         });
         
         // If we get a successful connection, try to get first pair details
-        if (allPairsLength > 0) {
-          try {
+        try {
             console.log(`   🔍 Getting first pair details...`);
             const firstPairAddress = await Promise.race([
               factoryContract.allPairs(0),

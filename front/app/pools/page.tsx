@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, 
   Filter, 
@@ -14,7 +14,8 @@ import {
   RefreshCw,
   Plus,
   Eye,
-  Activity
+  Activity,
+  Compass
 } from 'lucide-react';
 import { Pool, DashboardStats } from '@/lib/types';
 import { 
@@ -38,18 +39,57 @@ export default function PoolsPage() {
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [showFilters, setShowFilters] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Auto-initialize system on mount
+  useEffect(() => {
+    const initializeSystem = async () => {
+      try {
+        await fetch('/api/system/initialize');
+      } catch (error) {
+        console.warn('System initialization failed:', error);
+      }
+    };
+    
+    initializeSystem();
+  }, []);
 
   // Fetch pools data
   const { data: poolsData, isLoading, error, refetch } = useQuery({
     queryKey: ['pools', 'status'],
     queryFn: async () => {
-      const response = await fetch('/api/pools/status?detailed=true&timeframe=24h');
+      const response = await fetch('/api/pools/blockchain-status?detailed=true&timeframe=24h');
       if (!response.ok) {
         throw new Error('Failed to fetch pools data');
       }
       return response.json();
     },
     refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Pool discovery mutation
+  const discoverPoolsMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/pools/discover');
+      if (!response.ok) {
+        throw new Error('Failed to discover pools');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success(
+          'Pools Discovered!', 
+          `Found ${data.data.totalDiscovered} pools${data.data.imbalancedCount > 0 ? `, ${data.data.imbalancedCount} need rebalancing` : ''}`
+        );
+        queryClient.invalidateQueries({ queryKey: ['pools'] });
+      } else {
+        toast.error('Discovery Failed', data.error || 'Unknown error occurred');
+      }
+    },
+    onError: (error) => {
+      toast.error('Discovery Failed', error instanceof Error ? error.message : 'Unknown error occurred');
+    },
   });
 
   const pools: Pool[] = poolsData?.data?.pools || [];
@@ -161,6 +201,16 @@ export default function PoolsPage() {
         </div>
         
         <div className="flex items-center space-x-4 mt-4 lg:mt-0">
+          <button
+            onClick={() => discoverPoolsMutation.mutate()}
+            disabled={discoverPoolsMutation.isPending}
+            className="btn-secondary flex items-center space-x-2"
+            title="Discover existing pools from the blockchain"
+          >
+            <Compass className={`w-4 h-4 ${discoverPoolsMutation.isPending ? 'animate-spin' : ''}`} />
+            <span>Discover</span>
+          </button>
+          
           <button
             onClick={() => refetch()}
             disabled={isLoading}
@@ -366,13 +416,24 @@ export default function PoolsPage() {
               {searchTerm || filterType !== 'all' ? 'No pools match your criteria' : 'No pools found'}
             </p>
             {!searchTerm && filterType === 'all' && (
-              <Link 
-                href="/create-pool" 
-                className="px-6 py-3 bg-blue-500/20 border border-blue-400/30 rounded-xl text-blue-200 hover:bg-blue-500/30 transition-all duration-300 inline-flex items-center space-x-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Create First Pool</span>
-              </Link>
+              <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                <button
+                  onClick={() => discoverPoolsMutation.mutate()}
+                  disabled={discoverPoolsMutation.isPending}
+                  className="px-6 py-3 bg-purple-500/20 border border-purple-400/30 rounded-xl text-purple-200 hover:bg-purple-500/30 transition-all duration-300 inline-flex items-center space-x-2"
+                >
+                  <Compass className={`w-4 h-4 ${discoverPoolsMutation.isPending ? 'animate-spin' : ''}`} />
+                  <span>{discoverPoolsMutation.isPending ? 'Discovering...' : 'Discover Pools'}</span>
+                </button>
+                
+                <Link 
+                  href="/create-pool" 
+                  className="px-6 py-3 bg-blue-500/20 border border-blue-400/30 rounded-xl text-blue-200 hover:bg-blue-500/30 transition-all duration-300 inline-flex items-center space-x-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Create First Pool</span>
+                </Link>
+              </div>
             )}
           </div>
         ) : (

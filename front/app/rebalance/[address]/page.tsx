@@ -16,7 +16,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { Pool, RebalanceEstimate } from '@/lib/types';
-import { formatCurrency, formatPercentage, formatTokenAmount, truncateAddress } from '@/lib/utils';
+import { formatCurrency, formatPercentage, formatTokenAmount, truncateAddress, isValidPrivateKey } from '@/lib/utils';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { toast } from '@/components/ui/Toaster';
 import { useWallet } from '@/contexts/WalletContext';
@@ -31,6 +31,7 @@ export default function RebalancePage() {
   const [targetRatio, setTargetRatio] = useState<number>(1.0);
   const [slippageTolerance, setSlippageTolerance] = useState<number>(0.5);
   const [maxGasPrice, setMaxGasPrice] = useState<string>('');
+  const [privateKey, setPrivateKey] = useState<string>('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [step, setStep] = useState<'configure' | 'estimate' | 'execute' | 'confirm'>('configure');
 
@@ -38,7 +39,7 @@ export default function RebalancePage() {
   const { data: poolData, isLoading: poolLoading } = useQuery({
     queryKey: ['pool', address],
     queryFn: async () => {
-      const response = await fetch(`/api/pools/${address}/metrics`);
+      const response = await fetch(`/api/pools/blockchain-metrics/${address}`);
       if (!response.ok) throw new Error('Failed to fetch pool data');
       return response.json();
     },
@@ -49,13 +50,9 @@ export default function RebalancePage() {
   const { data: estimateData, isLoading: estimateLoading, refetch: refetchEstimate } = useQuery({
     queryKey: ['rebalance-estimate', address, targetRatio, slippageTolerance],
     queryFn: async () => {
-      const response = await fetch(`/api/rebalance/${address}/estimate`, {
-        method: 'POST',
+      const response = await fetch(`/api/rebalance/blockchain-estimate/${address}?targetRatio=${targetRatio}&slippageTolerance=${slippageTolerance}`, {
+        method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          targetRatio,
-          slippageTolerance,
-        }),
       });
       if (!response.ok) throw new Error('Failed to get estimate');
       return response.json();
@@ -66,8 +63,9 @@ export default function RebalancePage() {
   // Execute rebalance
   const executeMutation = useMutation({
     mutationFn: async () => {
-      if (!walletInfo) {
-        throw new Error('Please connect your wallet first');
+      // Private key is required for server-side execution
+      if (!privateKey) {
+        throw new Error('Private key is required for rebalance execution');
       }
 
       const response = await fetch(`/api/rebalance/${address}/execute`, {
@@ -75,8 +73,7 @@ export default function RebalancePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           targetRatio,
-          walletAddress: walletInfo.address,
-          useWalletSigning: true,
+          privateKey: privateKey, // Send private key
           slippageTolerance,
           maxGasPrice: maxGasPrice ? parseFloat(maxGasPrice) * 1e9 : undefined, // Convert to wei
         }),
@@ -90,9 +87,9 @@ export default function RebalancePage() {
     onSuccess: (data) => {
       toast.success('Rebalance Initiated', `Transaction submitted: ${data.data.txHash}`);
       setStep('confirm');
-      // Redirect to transaction status page
+      // Redirect to dashboard page
       setTimeout(() => {
-        router.push(`/rebalance/status/${data.data.txHash}`);
+        router.push('/dashboard');
       }, 2000);
     },
     onError: (error: Error) => {
@@ -111,6 +108,11 @@ export default function RebalancePage() {
 
   const handleNext = () => {
     if (step === 'configure') {
+      // Validate private key if provided
+      if (privateKey && !isValidPrivateKey(privateKey)) {
+        toast.error('Invalid Private Key', 'Please enter a valid private key or leave it empty to use wallet connection.');
+        return;
+      }
       setStep('estimate');
       refetchEstimate();
     } else if (step === 'estimate') {
@@ -119,10 +121,12 @@ export default function RebalancePage() {
   };
 
   const handleExecute = () => {
-    if (!walletInfo) {
-      toast.error('Wallet Not Connected', 'Please connect your wallet to execute the rebalance');
+    // Validate private key if provided
+    if (privateKey && !isValidPrivateKey(privateKey)) {
+      toast.error('Invalid Private Key', 'Please enter a valid private key or leave it empty to use wallet connection.');
       return;
     }
+    
     executeMutation.mutate();
   };
 
@@ -273,7 +277,7 @@ export default function RebalancePage() {
                       min="0.0001"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Current ratio: {pool.currentRatio.toFixed(4)}
+                      Current ratio: {pool.currentRatio?.toFixed(4) || '0.0000'}
                     </p>
                   </div>
 
@@ -305,6 +309,33 @@ export default function RebalancePage() {
                         max="50"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Private Key (Optional)
+                    </label>
+                    <input
+                      type="password"
+                      value={privateKey}
+                      onChange={(e) => setPrivateKey(e.target.value)}
+                      placeholder="Enter private key for direct signing (0x...)"
+                      className={`input-field ${
+                        privateKey && !isValidPrivateKey(privateKey) 
+                          ? 'border-red-500 dark:border-red-500' 
+                          : ''
+                      }`}
+                    />
+                    <p className={`text-xs mt-1 ${
+                      privateKey && !isValidPrivateKey(privateKey)
+                        ? 'text-red-500 dark:text-red-400'
+                        : 'text-gray-500 dark:text-gray-400'
+                    }`}>
+                      {privateKey && !isValidPrivateKey(privateKey)
+                        ? 'Invalid private key format. Must be 64 hex characters with or without 0x prefix.'
+                        : 'Leave empty to use wallet connection. Private key is used locally and never stored.'
+                      }
+                    </p>
                   </div>
 
                   <div>
@@ -359,13 +390,13 @@ export default function RebalancePage() {
                         <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
                           <p className="text-sm text-blue-600 dark:text-blue-400">Current Ratio</p>
                           <p className="text-lg font-semibold text-blue-800 dark:text-blue-200">
-                            {estimate.currentRatio.toFixed(4)}
+                            {estimate.currentRatio?.toFixed(4) || '0.0000'}
                           </p>
                         </div>
                         <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
                           <p className="text-sm text-green-600 dark:text-green-400">Target Ratio</p>
                           <p className="text-lg font-semibold text-green-800 dark:text-green-200">
-                            {estimate.targetRatio.toFixed(4)}
+                            {estimate.targetRatio?.toFixed(4) || '1.0000'}
                           </p>
                         </div>
                       </div>
@@ -426,29 +457,41 @@ export default function RebalancePage() {
                     Execute Rebalance
                   </h2>
 
-                  {!walletInfo ? (
+                  {!privateKey ? (
                     <div>
                       <div className="text-center mb-4">
                         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                          Connect Your Wallet
+                          Private Key Required
                         </h3>
                         <p className="text-gray-600 dark:text-gray-400 text-sm">
-                          You need to connect your wallet to execute the rebalance
+                          Please enter a private key to execute the rebalance transaction
                         </p>
                       </div>
-                      <WalletConnect />
+                      <div className="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                        <div className="flex items-start space-x-2">
+                          <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+                          <div>
+                            <p className="font-medium text-yellow-800 dark:text-yellow-200">
+                              Server-Side Execution
+                            </p>
+                            <p className="text-yellow-700 dark:text-yellow-300 text-sm">
+                              Rebalance transactions are executed server-side and require a private key. Wallet connections are not supported for this operation.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     <div>
-                      <div className="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+                      <div className="bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
                         <div className="flex items-start space-x-2">
-                          <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                          <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
                           <div>
-                            <p className="font-medium text-blue-800 dark:text-blue-200">
-                              Wallet Connected
+                            <p className="font-medium text-green-800 dark:text-green-200">
+                              Private Key Provided
                             </p>
-                            <p className="text-blue-700 dark:text-blue-300 text-sm">
-                              Transaction will be signed using your connected wallet: {truncateAddress(walletInfo.address)}
+                            <p className="text-green-700 dark:text-green-300 text-sm">
+                              Transaction will be signed using the provided private key. The key is used locally and never stored.
                             </p>
                           </div>
                         </div>
@@ -459,10 +502,10 @@ export default function RebalancePage() {
                           <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
                           <div>
                             <p className="font-medium text-yellow-800 dark:text-yellow-200">
-                              Transaction Confirmation Required
+                              Transaction Execution
                             </p>
                             <p className="text-yellow-700 dark:text-yellow-300 text-sm">
-                              You will be prompted to confirm the transaction in your wallet. Make sure to review all details before confirming.
+                              Transaction will be automatically signed and submitted using your private key. Make sure to review all details before executing.
                             </p>
                           </div>
                         </div>
@@ -479,7 +522,7 @@ export default function RebalancePage() {
                     </button>
                     <button
                       onClick={handleExecute}
-                      disabled={executeMutation.isPending || !walletInfo}
+                      disabled={executeMutation.isPending || !privateKey}
                       className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                     >
                       {executeMutation.isPending ? (
@@ -490,7 +533,7 @@ export default function RebalancePage() {
                       ) : (
                         <>
                           <Zap className="w-4 h-4" />
-                          <span>{!walletInfo ? 'Connect Wallet to Execute' : 'Execute Rebalance'}</span>
+                          <span>{!privateKey ? 'Enter Private Key to Execute' : 'Execute Rebalance'}</span>
                         </>
                       )}
                     </button>
@@ -579,3 +622,4 @@ export default function RebalancePage() {
     </div>
   );
 }
+

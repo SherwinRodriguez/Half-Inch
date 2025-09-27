@@ -6,6 +6,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(value: number, currency = 'USD'): string {
+  // Handle null, undefined, or invalid inputs
+  if (value === null || value === undefined || isNaN(value) || !isFinite(value)) {
+    return '$0.00';
+  }
+  
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
@@ -15,6 +20,11 @@ export function formatCurrency(value: number, currency = 'USD'): string {
 }
 
 export function formatPercentage(value: number, decimals = 2): string {
+  // Handle null, undefined, or invalid inputs
+  if (value === null || value === undefined || isNaN(value) || !isFinite(value)) {
+    return '0.00%';
+  }
+  
   return `${value.toFixed(decimals)}%`;
 }
 
@@ -103,7 +113,17 @@ export function isValidPrivateKey(privateKey: string): boolean {
 }
 
 export function formatTokenAmount(amount: string | number, decimals = 18, displayDecimals = 4): string {
-  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+  // Handle null, undefined, or invalid inputs
+  if (amount === null || amount === undefined || amount === '') {
+    return '0';
+  }
+  
+  const num = typeof amount === 'string' ? parseFloat(amount) : Number(amount);
+  
+  // Check if num is valid
+  if (isNaN(num) || !isFinite(num)) {
+    return '0';
+  }
   
   if (num === 0) return '0';
   

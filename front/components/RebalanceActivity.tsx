@@ -115,9 +115,9 @@ function RebalanceEventItem({ event }: RebalanceEventItemProps) {
         
         <div className="mt-1 flex items-center justify-between">
           <div className="text-xs text-gray-600 dark:text-gray-400">
-            Ratio: {event.fromRatio.toFixed(4)} → {event.toRatio.toFixed(4)}
+            Ratio: {event.fromRatio?.toFixed(4) || '0.0000'} → {event.toRatio?.toFixed(4) || '0.0000'}
             <span className={`ml-1 ${ratioChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              ({ratioChange > 0 ? '+' : ''}{ratioChangePercent.toFixed(2)}%)
+              ({ratioChange > 0 ? '+' : ''}{ratioChangePercent?.toFixed(2) || '0.00'}%)
             </span>
           </div>
           
@@ -134,7 +134,7 @@ function RebalanceEventItem({ event }: RebalanceEventItemProps) {
         
         {event.slippage > 0 && (
           <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-            Slippage: {event.slippage.toFixed(2)}%
+            Slippage: {event.slippage?.toFixed(2) || '0.00'}%
           </div>
         )}
       </div>

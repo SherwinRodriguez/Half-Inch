@@ -6,6 +6,7 @@ import { Navigation } from '@/components/Navigation';
 import { Toaster } from '@/components/ui/Toaster';
 import { PageTransition } from '@/components/PageTransition';
 import PatternBackground from '@/components/PatternBackground';
+import { SystemInitializer } from '@/components/SystemInitializer';
 
 // Primary fonts
 const unbounded = Unbounded({ 
@@ -54,18 +55,20 @@ export default function RootLayout({
       </head>
       <body className={`${unbounded.variable} ${spaceGrotesk.variable} font-space-grotesk antialiased`}>
         <Providers>
-          <div className="min-h-screen relative">
-            <PatternBackground />
-            <div className="relative z-20">
-              <Navigation />
-              <main className="pt-16">
-                <PageTransition>
-                  {children}
-                </PageTransition>
-              </main>
+          <SystemInitializer>
+            <div className="min-h-screen relative">
+              <PatternBackground />
+              <div className="relative z-20">
+                <Navigation />
+                <main className="pt-16">
+                  <PageTransition>
+                    {children}
+                  </PageTransition>
+                </main>
+              </div>
+              <Toaster />
             </div>
-            <Toaster />
-          </div>
+          </SystemInitializer>
         </Providers>
       </body>
     </html>

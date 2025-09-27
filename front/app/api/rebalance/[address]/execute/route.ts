@@ -12,34 +12,68 @@ export async function POST(
     const { 
       targetRatio, 
       privateKey, 
+      walletAddress,
+      useWalletSigning = false,
       rpcUrl, 
       maxGasPrice,
       slippageTolerance = 0.5,
       forceExecute = false 
     } = await request.json();
     
-    if (!privateKey) {
+    if (!privateKey && !useWalletSigning) {
       const response: ApiResponse<null> = {
         success: false,
-        error: 'Private key required for transaction execution',
+        error: 'Either private key or wallet signing required for transaction execution',
         timestamp: Date.now()
       };
       return NextResponse.json(response, { status: 400 });
     }
     
-    // Get pool data
-    const pool = database.getPool(address);
-    if (!pool) {
+    // Get pool data from blockchain instead of database
+    let pool;
+    try {
+      const poolResponse = await fetch(`${request.nextUrl.origin}/api/pools/blockchain-metrics/${address}`);
+      if (!poolResponse.ok) {
+        throw new Error('Failed to fetch pool data from blockchain');
+      }
+      const poolData = await poolResponse.json();
+      if (!poolData.success) {
+        throw new Error(poolData.error || 'Failed to fetch pool data');
+      }
+      pool = poolData.data;
+    } catch (error) {
       const response: ApiResponse<null> = {
         success: false,
-        error: 'Pool not found',
+        error: `Pool not found: ${error instanceof Error ? error.message : 'Unknown error'}`,
         timestamp: Date.now()
       };
       return NextResponse.json(response, { status: 404 });
     }
     
     // Initialize contract service with signer
-    const contractService = new ContractService(rpcUrl || undefined, privateKey);
+    let contractService: ContractService;
+    
+    if (privateKey) {
+      // Use private key for signing
+      contractService = new ContractService(rpcUrl || undefined, privateKey);
+    } else if (useWalletSigning && walletAddress) {
+      // Use wallet signing (this would require a different approach in a real implementation)
+      // For now, we'll return an error since wallet signing requires client-side interaction
+      const response: ApiResponse<null> = {
+        success: false,
+        error: 'Wallet signing not supported in server-side execution. Please use a private key.',
+        timestamp: Date.now()
+      };
+      return NextResponse.json(response, { status: 400 });
+    } else {
+      const response: ApiResponse<null> = {
+        success: false,
+        error: 'No valid signing method provided',
+        timestamp: Date.now()
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
+    
     const rebalancerContract = await contractService.getRebalancerContract();
     const pairContract = await contractService.getPairContract(address);
     

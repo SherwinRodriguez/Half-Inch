@@ -26,7 +26,7 @@ export function Dashboard() {
   const { data: poolsData, isLoading: poolsLoading } = useQuery({
     queryKey: ['pools-status', selectedTimeframe],
     queryFn: async () => {
-      const response = await fetch(`/api/pools/status?detailed=true&timeframe=${selectedTimeframe}`);
+      const response = await fetch(`/api/pools/blockchain-status?detailed=true&timeframe=${selectedTimeframe}`);
       if (!response.ok) throw new Error('Failed to fetch pools data');
       return response.json();
     },

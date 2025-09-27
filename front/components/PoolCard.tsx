@@ -244,7 +244,7 @@ export function PoolCard({ pool, showActions = true }: PoolCardProps) {
             Current Ratio
           </span>
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            Target: {pool.targetRatio.toFixed(4)}
+            Target: {pool.targetRatio?.toFixed(4) || '1.0000'}
           </span>
         </div>
         
@@ -266,7 +266,7 @@ export function PoolCard({ pool, showActions = true }: PoolCardProps) {
               ? 'text-red-600 dark:text-red-400' 
               : 'text-green-600 dark:text-green-400'
           }`}>
-            {pool.currentRatio.toFixed(4)}
+            {pool.currentRatio?.toFixed(4) || '0.0000'}
           </span>
         </div>
         
