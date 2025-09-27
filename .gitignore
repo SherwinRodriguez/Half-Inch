@@ -1,16 +1,20 @@
-# Dependencies
+# ===================================
+# DEPENDENCIES & PACKAGE MANAGERS
+# ===================================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+# Note: package-lock.json should be committed for npm projects
+# yarn.lock should be committed for yarn projects
+# pnpm-lock.yaml should be committed for pnpm projects
 
 # Runtime data
 pids
 *.pid
 *.seed
-*.pid.lock
 
 # Coverage directory used by tools like istanbul
 coverage/
@@ -61,20 +65,31 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variable files
+# ===================================
+# ENVIRONMENT & CONFIGURATION
+# ===================================
 .env
+.env.local
 .env.development.local
 .env.test.local
 .env.production.local
-.env.local
+.env.*.local
+config.json
+secrets.json
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
 
-# Next.js build output
-.next
+# ===================================
+# NEXT.JS & FRONTEND BUILD
+# ===================================
+.next/
 out/
+.vercel/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
 
 # Nuxt.js build / generate output
 .nuxt
@@ -109,13 +124,18 @@ public
 .yarn/install-state.gz
 .pnp.*
 
+# ===================================
+# BLOCKCHAIN & SMART CONTRACTS
+# ===================================
 # Hardhat files
 cache/
 artifacts/
 typechain-types/
+contracts/flattened/
 
-# Hardhat Ignition default folder for deployments against a local node
+# Hardhat Ignition deployments
 ignition/deployments/chain-31337/
+ignition/deployments/localhost/
 
 # Solidity coverage files
 coverage.json
@@ -126,6 +146,18 @@ gas-report.txt
 
 # Local blockchain data
 .openzeppelin/
+.chainlink/
+
+# Contract deployment artifacts
+deployed-addresses.json
+deployment-config.json
+contract-addresses.json
+
+# Private keys and mnemonics
+*.key
+*.mnemonic
+private-keys/
+wallets/
 
 # IDE files
 .vscode/
@@ -160,16 +192,52 @@ temp/
 build/
 dist/
 
+# ===================================
+# SECURITY & SENSITIVE DATA
+# ===================================
 # Private keys and sensitive data
 *.key
 *.pem
-private-keys/
+*.p12
+*.pfx
 secrets/
+.secrets/
 
-# Deployment artifacts
-deployments/
-deployed-addresses.json
+# API keys and tokens
+api-keys.json
+.api-keys
+tokens.json
 
+# ===================================
+# DEX-SPECIFIC FILES
+# ===================================
+# Pool data and metrics
+pool-data/
+metrics-cache/
+rebalance-logs/
+
+# Trading history
+trades/
+transactions/
+swap-history/
+
+# Liquidity provider data
+lp-positions/
+rewards-cache/
+
+# ===================================
+# TEST & DEVELOPMENT
+# ===================================
 # Test artifacts
 test-results/
 coverage-reports/
+test-cache/
+
+# Development databases
+dev.db
+test.db
+local.db
+
+# Mock data
+mocks/
+fixtures/
