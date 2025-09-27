@@ -7,6 +7,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+# Runtime data for local development
+.local.db
+
 # Note: package-lock.json should be committed for npm projects
 # yarn.lock should be committed for yarn projects
 # pnpm-lock.yaml should be committed for pnpm projects
@@ -76,6 +79,7 @@ jspm_packages/
 .env.*.local
 config.json
 secrets.json
+.env*
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
