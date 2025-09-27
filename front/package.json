@@ -20,9 +20,11 @@
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
     "ethers": "^6.13.0",
+    "gsap": "^3.13.0",
     "lucide-react": "^0.294.0",
     "next": "^14.0.0",
     "next-themes": "^0.4.6",
+    "ogl": "^1.0.11",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.8.0",
@@ -32,7 +34,6 @@
     "zustand": "^4.4.0"
   },
   "devDependencies": {
-    "@next/swc-win32-x64-msvc": "^15.5.4",
     "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",

@@ -1,11 +1,26 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Unbounded, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { Navigation } from '@/components/Navigation';
 import { Toaster } from '@/components/ui/Toaster';
+import PatternBackground from '@/components/PatternBackground';
 
-const inter = Inter({ subsets: ['latin'] });
+// Primary fonts
+const unbounded = Unbounded({ 
+  subsets: ['latin'], 
+  variable: '--font-unbounded',
+  display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({ 
+  subsets: ['latin'], 
+  variable: '--font-space-grotesk',
+  display: 'swap',
+});
+
+// Note: Bricolage Grotesque and TAN NIMBUS are not available on Google Fonts
+// We'll need to add them via external links or self-hosted fonts
 
 export const metadata: Metadata = {
   title: 'Hues DEX - Liquidity Rebalancing Platform',
@@ -26,14 +41,27 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <head>
+        {/* Add external font links for fonts not available on Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap"
+          rel="stylesheet"
+        />
+        {/* TAN NIMBUS font will be loaded via CSS */}
+      </head>
+      <body className={`${unbounded.variable} ${spaceGrotesk.variable} font-space-grotesk antialiased`}>
         <Providers>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <Navigation />
-            <main className="pt-16">
-              {children}
-            </main>
-            <Toaster />
+          <div className="min-h-screen relative">
+            <PatternBackground />
+            <div className="relative z-20">
+              <Navigation />
+              <main className="pt-16">
+                {children}
+              </main>
+              <Toaster />
+            </div>
           </div>
         </Providers>
       </body>

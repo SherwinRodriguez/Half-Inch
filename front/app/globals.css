@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom fonts */
+@font-face {
+  font-family: "TAN NIMBUS";
+  src: url("/fonts/TAN-NIMBUS.woff2") format("woff2"),
+    url("/fonts/TAN-NIMBUS.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -56,61 +66,91 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Font hierarchy styles */
+  h1 {
+    @apply font-unbounded font-bold;
+  }
+
+  h2,
+  h3 {
+    @apply font-bricolage font-semibold;
+  }
+
+  h4,
+  h5,
+  h6 {
+    @apply font-bricolage font-medium;
+  }
+
+  p,
+  span,
+  div,
+  button,
+  input,
+  textarea {
+    @apply font-space-grotesk;
+  }
+
+  /* Special heading class for TAN NIMBUS */
+  .font-tan-nimbus {
+    font-family: "TAN NIMBUS", "Unbounded", sans-serif;
+  }
 }
 
 @layer components {
   .gradient-bg {
     @apply bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900;
   }
-  
+
   .card-gradient {
     @apply bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900;
   }
-  
+
   .glass-effect {
     @apply bg-white/10 backdrop-blur-md border border-white/20;
   }
-  
+
   .pool-card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300;
+    @apply bg-black/20 backdrop-blur-md rounded-xl shadow-lg border border-white/10 hover:bg-black/30 hover:border-white/20 transition-all duration-300;
   }
-  
+
   .metric-card {
     @apply bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-6 shadow-lg;
   }
-  
+
   .status-badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
-  
+
   .status-balanced {
     @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300;
   }
-  
+
   .status-imbalanced {
     @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300;
   }
-  
+
   .status-pending {
     @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300;
   }
-  
+
   .btn-primary {
     @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
   }
-  
+
   .btn-secondary {
     @apply bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
   }
-  
+
   .btn-danger {
     @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
   }
-  
+
   .input-field {
     @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent;
   }
-  
+
   .chart-container {
     @apply bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700;
   }
@@ -120,13 +160,21 @@
   .text-gradient {
     @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
   }
-  
+
   .animate-pulse-slow {
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
-  
+
   .animate-bounce-slow {
     animation: bounce 2s infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
   }
 }
 
@@ -154,6 +202,26 @@
   }
   100% {
     background-position: 468px 0;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+  }
+  to {
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.8),
+      0 0 40px rgba(168, 85, 247, 0.6);
   }
 }
 
@@ -201,7 +269,7 @@
   .pool-card {
     @apply mx-2;
   }
-  
+
   .metric-card {
     @apply p-4;
   }
@@ -212,7 +280,7 @@
   .no-print {
     display: none !important;
   }
-  
+
   .pool-card {
     @apply shadow-none border-2;
   }

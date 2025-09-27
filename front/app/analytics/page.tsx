@@ -17,8 +17,7 @@ import {
 import { DashboardStats } from '@/lib/types';
 import { 
   formatCurrency, 
-  formatPercentage, 
-  formatNumber
+  formatPercentage
 } from '@/lib/utils';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
@@ -72,10 +71,10 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Analytics Dashboard
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-white/80">
             Comprehensive insights into DEX performance and metrics
           </p>
         </div>
@@ -203,7 +202,7 @@ export default function AnalyticsPage() {
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Total Users</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {formatNumber(additionalStats.totalUsers)}
+                    {additionalStats.totalUsers.toLocaleString()}
                   </p>
                   <div className="flex items-center space-x-1 text-xs mt-1 text-green-600">
                     <TrendingUp className="w-3 h-3" />
@@ -220,7 +219,7 @@ export default function AnalyticsPage() {
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Transactions</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {formatNumber(additionalStats.totalTransactions)}
+                    {additionalStats.totalTransactions.toLocaleString()}
                   </p>
                   <div className="flex items-center space-x-1 text-xs mt-1 text-green-600">
                     <TrendingUp className="w-3 h-3" />
@@ -254,7 +253,7 @@ export default function AnalyticsPage() {
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Rebalances</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {formatNumber(additionalStats.rebalanceEvents)}
+                    {additionalStats.rebalanceEvents.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     automated events

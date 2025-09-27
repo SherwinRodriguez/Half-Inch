@@ -148,14 +148,14 @@ export default function PoolsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h1 className="text-4xl font-tan-nimbus font-bold text-white mb-2">
             Liquidity Pools
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-white/80 text-lg font-space-grotesk">
             Discover and manage liquidity pools on the Hues DEX platform
           </p>
         </div>
@@ -178,75 +178,110 @@ export default function PoolsPage() {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="stat-card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Pools</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {stats.totalPools}
-              </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { title: 'Total Pools', value: stats.totalPools.toString(), icon: Droplets, color: 'blue' },
+          { title: 'Total TVL', value: formatCurrency(stats.totalTVL), icon: BarChart3, color: 'green' },
+          { title: '24h Volume', value: formatCurrency(stats.totalVolume24h), icon: Activity, color: 'purple' },
+          { title: 'Avg APY', value: formatPercentage(stats.averageAPY), icon: TrendingUp, color: 'orange' }
+        ].map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <div 
+              key={index}
+              className="rounded-2xl p-6 transition-all duration-300 hover:scale-105 relative overflow-hidden"
+              style={{
+                background: 'rgba(255, 255, 255, 0.23)',
+                backdropFilter: 'blur(21px)',
+                WebkitBackdropFilter: 'blur(21px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: `
+                  0 8px 32px rgba(0, 0, 0, 0.1),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                  inset 0 -1px 0 rgba(255, 255, 255, 0.1)
+                `
+              }}
+            >
+              {/* Gradient highlights */}
+              <div 
+                className="absolute top-0 left-0 right-0 h-px"
+                style={{
+                  background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent)'
+                }}
+              />
+              <div 
+                className="absolute top-0 left-0 w-px h-full"
+                style={{
+                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.8), transparent, rgba(255, 255, 255, 0.3))'
+                }}
+              />
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-white/70 mb-2">{stat.title}</p>
+                  <p className="text-3xl font-bold text-white">
+                    {stat.value}
+                  </p>
+                </div>
+                <div className={`p-3 rounded-full ${
+                  stat.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
+                  stat.color === 'green' ? 'bg-gradient-to-r from-green-500 to-green-600' :
+                  stat.color === 'purple' ? 'bg-gradient-to-r from-purple-500 to-purple-600' :
+                  'bg-gradient-to-r from-orange-500 to-orange-600'
+                }`}>
+                  <Icon className="w-6 h-6 text-white" />
+                </div>
+              </div>
             </div>
-            <Droplets className="w-8 h-8 text-blue-500" />
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total TVL</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {formatCurrency(stats.totalTVL)}
-              </p>
-            </div>
-            <BarChart3 className="w-8 h-8 text-green-500" />
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">24h Volume</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {formatCurrency(stats.totalVolume24h)}
-              </p>
-            </div>
-            <Activity className="w-8 h-8 text-purple-500" />
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Avg APY</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {formatPercentage(stats.averageAPY)}
-              </p>
-            </div>
-            <TrendingUp className="w-8 h-8 text-orange-500" />
-          </div>
-        </div>
+          );
+        })}
       </div>
 
       {/* Search and Filters */}
-      <div className="pool-card p-6 mb-8">
+      <div 
+        className="rounded-2xl p-6 relative overflow-hidden"
+        style={{
+          background: 'rgba(255, 255, 255, 0.23)',
+          backdropFilter: 'blur(21px)',
+          WebkitBackdropFilter: 'blur(21px)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          boxShadow: `
+            0 8px 32px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.1)
+          `
+        }}
+      >
+        {/* Gradient highlights */}
+        <div 
+          className="absolute top-0 left-0 right-0 h-px"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent)'
+          }}
+        />
+        <div 
+          className="absolute top-0 left-0 w-px h-full"
+          style={{
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.8), transparent, rgba(255, 255, 255, 0.3))'
+          }}
+        />
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           {/* Search */}
           <div className="relative flex-1 lg:max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60" />
             <input
               type="text"
               placeholder="Search pools by token or address..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-field pl-10"
+              className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/40 transition-all duration-300"
             />
           </div>
 
           {/* Filter Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="btn-secondary flex items-center space-x-2"
+            className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white hover:bg-white/20 transition-all duration-300 flex items-center space-x-2"
           >
             <Filter className="w-4 h-4" />
             <span>Filters</span>
@@ -255,8 +290,8 @@ export default function PoolsPage() {
 
         {/* Filter Options */}
         {showFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex flex-wrap gap-2">
+          <div className="mt-4 pt-4 border-t border-white/20">
+            <div className="flex flex-wrap gap-3">
               {[
                 { key: 'all', label: 'All Pools' },
                 { key: 'active', label: 'Active Only' },
@@ -266,10 +301,10 @@ export default function PoolsPage() {
                 <button
                   key={filter.key}
                   onClick={() => setFilterType(filter.key as FilterType)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                     filterType === filter.key
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      ? 'bg-white/30 text-white border border-white/40'
+                      : 'bg-white/10 text-white/80 border border-white/20 hover:bg-white/20 hover:text-white'
                   }`}
                 >
                   {filter.label}
@@ -281,84 +316,117 @@ export default function PoolsPage() {
       </div>
 
       {/* Pools Table */}
-      <div className="pool-card overflow-hidden">
+      <div 
+        className="rounded-2xl overflow-hidden relative"
+        style={{
+          background: 'rgba(255, 255, 255, 0.23)',
+          backdropFilter: 'blur(21px)',
+          WebkitBackdropFilter: 'blur(21px)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          boxShadow: `
+            0 8px 32px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.1)
+          `
+        }}
+      >
+        {/* Gradient highlights */}
+        <div 
+          className="absolute top-0 left-0 right-0 h-px"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent)'
+          }}
+        />
+        <div 
+          className="absolute top-0 left-0 w-px h-full"
+          style={{
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.8), transparent, rgba(255, 255, 255, 0.3))'
+          }}
+        />
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <LoadingSpinner size="large" />
           </div>
         ) : error ? (
-          <div className="text-center py-12">
-            <p className="text-red-600 dark:text-red-400 mb-4">
+          <div className="text-center py-12 px-6">
+            <p className="text-red-300 mb-4 text-lg">
               Failed to load pools data
             </p>
-            <button onClick={() => refetch()} className="btn-primary">
+            <button 
+              onClick={() => refetch()} 
+              className="px-6 py-3 bg-red-500/20 border border-red-400/30 rounded-xl text-red-200 hover:bg-red-500/30 transition-all duration-300"
+            >
               Try Again
             </button>
           </div>
         ) : filteredAndSortedPools.length === 0 ? (
-          <div className="text-center py-12">
-            <Droplets className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+          <div className="text-center py-12 px-6">
+            <Droplets className="w-16 h-16 text-white/40 mx-auto mb-6" />
+            <p className="text-white/80 mb-6 text-lg">
               {searchTerm || filterType !== 'all' ? 'No pools match your criteria' : 'No pools found'}
             </p>
             {!searchTerm && filterType === 'all' && (
-              <Link href="/create-pool" className="btn-primary">
-                Create First Pool
+              <Link 
+                href="/create-pool" 
+                className="px-6 py-3 bg-blue-500/20 border border-blue-400/30 rounded-xl text-blue-200 hover:bg-blue-500/30 transition-all duration-300 inline-flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Create First Pool</span>
               </Link>
             )}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-800">
+              <thead className="bg-white/10 border-b border-white/20">
                 <tr>
-                  <th className="px-6 py-3 text-left">
+                  <th className="px-6 py-4 text-left">
                     <button
                       onClick={() => handleSort('name')}
-                      className="flex items-center space-x-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300"
+                      className="flex items-center space-x-1 text-sm font-medium text-white/80 uppercase tracking-wider hover:text-white transition-colors duration-200"
                     >
                       <span>Pool</span>
                       {getSortIcon('name')}
                     </button>
                   </th>
-                  <th className="px-6 py-3 text-left">
+                  <th className="px-6 py-4 text-left">
                     <button
                       onClick={() => handleSort('tvl')}
-                      className="flex items-center space-x-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300"
+                      className="flex items-center space-x-1 text-sm font-medium text-white/80 uppercase tracking-wider hover:text-white transition-colors duration-200"
                     >
                       <span>TVL</span>
                       {getSortIcon('tvl')}
                     </button>
                   </th>
-                  <th className="px-6 py-3 text-left">
+                  <th className="px-6 py-4 text-left">
                     <button
                       onClick={() => handleSort('volume24h')}
-                      className="flex items-center space-x-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300"
+                      className="flex items-center space-x-1 text-sm font-medium text-white/80 uppercase tracking-wider hover:text-white transition-colors duration-200"
                     >
                       <span>24h Volume</span>
                       {getSortIcon('volume24h')}
                     </button>
                   </th>
-                  <th className="px-6 py-3 text-left">
+                  <th className="px-6 py-4 text-left">
                     <button
                       onClick={() => handleSort('apy')}
-                      className="flex items-center space-x-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-300"
+                      className="flex items-center space-x-1 text-sm font-medium text-white/80 uppercase tracking-wider hover:text-white transition-colors duration-200"
                     >
                       <span>APY</span>
                       {getSortIcon('apy')}
                     </button>
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-sm font-medium text-white/80 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-sm font-medium text-white/80 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="divide-y divide-white/10">
                 {filteredAndSortedPools.map((pool) => (
-                  <tr key={pool.address} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <tr key={pool.address} className="hover:bg-white/5 transition-colors duration-200">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-3">
                         <div className="flex -space-x-2">
@@ -370,12 +438,12 @@ export default function PoolsPage() {
                           </div>
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          <div className="text-sm font-medium text-white">
                             {pool.tokenA.symbol} / {pool.tokenB.symbol}
                           </div>
                           <button
                             onClick={() => handleCopyAddress(pool.address)}
-                            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                            className="text-xs text-white/60 hover:text-white/80 transition-colors duration-200"
                           >
                             {truncateAddress(pool.address)}
                           </button>
@@ -383,34 +451,34 @@ export default function PoolsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      <div className="text-sm font-medium text-white">
                         {formatCurrency(pool.tvl)}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                      <div className="text-xs text-white/60">
                         {formatTokenAmount(pool.reserveA)} {pool.tokenA.symbol} + {formatTokenAmount(pool.reserveB)} {pool.tokenB.symbol}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-gray-100">
+                      <div className="text-sm text-white">
                         {formatCurrency(pool.volume24h || 0)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-gray-100">
+                      <div className="text-sm text-white">
                         {formatPercentage(pool.apy || 0)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col space-y-1">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
                           pool.isActive
-                            ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                            : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'
+                            ? 'bg-green-500/20 border border-green-400/30 text-green-200'
+                            : 'bg-red-500/20 border border-red-400/30 text-red-200'
                         }`}>
                           {pool.isActive ? 'Active' : 'Inactive'}
                         </span>
                         {pool.needsRebalancing && (
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                          <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-yellow-500/20 border border-yellow-400/30 text-yellow-200">
                             Rebalance
                           </span>
                         )}
@@ -420,14 +488,16 @@ export default function PoolsPage() {
                       <div className="flex items-center space-x-2">
                         <Link
                           href={`/pools/${pool.address}`}
-                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                          className="p-2 rounded-lg bg-blue-500/20 text-blue-200 hover:bg-blue-500/30 hover:text-blue-100 transition-all duration-200"
+                          title="View Pool Details"
                         >
                           <Eye className="w-4 h-4" />
                         </Link>
                         {pool.needsRebalancing && (
                           <Link
                             href={`/rebalance/${pool.address}`}
-                            className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300"
+                            className="p-2 rounded-lg bg-orange-500/20 text-orange-200 hover:bg-orange-500/30 hover:text-orange-100 transition-all duration-200"
+                            title="Rebalance Pool"
                           >
                             <Activity className="w-4 h-4" />
                           </Link>
@@ -436,7 +506,8 @@ export default function PoolsPage() {
                           href={`https://explorer.testnet.rsk.co/address/${pool.address}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300"
+                          className="p-2 rounded-lg bg-white/10 text-white/60 hover:bg-white/20 hover:text-white/80 transition-all duration-200"
+                          title="View on Explorer"
                         >
                           <ExternalLink className="w-4 h-4" />
                         </a>
@@ -452,7 +523,7 @@ export default function PoolsPage() {
 
       {/* Results Summary */}
       {!isLoading && !error && filteredAndSortedPools.length > 0 && (
-        <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-center text-sm text-white/60">
           Showing {filteredAndSortedPools.length} of {pools.length} pools
           {searchTerm && ` matching "${searchTerm}"`}
           {filterType !== 'all' && ` (${filterType} filter applied)`}

@@ -111,18 +111,18 @@ export function Dashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-tan-nimbus font-bold text-white">
             Dashboard
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-white/80 mt-1 font-space-grotesk">
             Monitor and manage your DEX liquidity pools
           </p>
         </div>
         
         <div className="mt-4 md:mt-0">
           <div className="flex items-center space-x-2">
-            <Clock className="w-4 h-4 text-gray-500" />
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <Clock className="w-4 h-4 text-white/60" />
+            <span className="text-sm text-white/60">
               Last updated: {formatTimeAgo(Date.now())}
             </span>
           </div>
@@ -138,32 +138,93 @@ export function Dashboard() {
           const TrendIcon = trendIcon;
           
           return (
-            <div key={index} className="pool-card p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    {stat.title}
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-                    {stat.value}
-                  </p>
+            <div 
+              key={index} 
+              className="rounded-2xl p-6 transition-all duration-300 hover:scale-105 relative overflow-hidden"
+              style={{
+                background: 'rgba(255, 255, 255, 0.23)',
+                backdropFilter: 'blur(21px)',
+                WebkitBackdropFilter: 'blur(21px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: `
+                  0 8px 32px rgba(0, 0, 0, 0.1),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                  inset 0 -1px 0 rgba(255, 255, 255, 0.1)
+                `
+              }}
+            >
+              {/* Gradient highlights */}
+              <div 
+                className="absolute top-0 left-0 right-0 h-px"
+                style={{
+                  background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent)'
+                }}
+              />
+              <div 
+                className="absolute top-0 left-0 w-px h-full"
+                style={{
+                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.8), transparent, rgba(255, 255, 255, 0.3))'
+                }}
+              />
+              
+              {/* Title Section */}
+              <div className="flex items-center mb-4">
+                <div className={`relative p-2 w-10 h-10 rounded-full flex items-center justify-center ${
+                  stat.color === 'blue' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
+                  stat.color === 'green' ? 'bg-gradient-to-r from-green-500 to-green-600' :
+                  stat.color === 'purple' ? 'bg-gradient-to-r from-purple-500 to-purple-600' :
+                  'bg-gradient-to-r from-orange-500 to-orange-600'
+                }`}>
+                  <Icon className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-white" />
                 </div>
-                <div className={`p-3 rounded-full bg-${stat.color}-100 dark:bg-${stat.color}-900`}>
-                  <Icon className={`w-6 h-6 text-${stat.color}-600 dark:text-${stat.color}-400`} />
+                <p className="ml-3 text-white text-lg font-medium">
+                  {stat.title}
+                </p>
+                <div className="ml-auto font-semibold flex items-center">
+                  <TrendIcon className={`w-5 h-5 ${
+                    stat.trend === 'up' ? 'text-green-300' : 
+                    stat.trend === 'down' ? 'text-red-300' : 'text-white/60'
+                  }`} />
+                  <span className={`ml-1 text-sm ${
+                    stat.trend === 'up' ? 'text-green-300' : 
+                    stat.trend === 'down' ? 'text-red-300' : 'text-white/60'
+                  }`}>
+                    {stat.trend === 'up' ? '+' : stat.trend === 'down' ? '-' : ''}
+                    {stat.trend !== 'neutral' ? '20%' : ''}
+                  </span>
                 </div>
               </div>
-              <div className="flex items-center mt-4">
-                <TrendIcon className={`w-4 h-4 mr-1 ${
-                  stat.trend === 'up' ? 'text-green-500' : 
-                  stat.trend === 'down' ? 'text-red-500' : 'text-gray-500'
-                }`} />
-                <span className={`text-sm ${
-                  stat.trend === 'up' ? 'text-green-600 dark:text-green-400' : 
-                  stat.trend === 'down' ? 'text-red-600 dark:text-red-400' : 
-                  'text-gray-600 dark:text-gray-400'
+              
+              {/* Data Section */}
+              <div className="flex flex-col">
+                <p className="mt-4 mb-4 text-white text-4xl leading-10 font-bold text-left">
+                  {stat.value}
+                </p>
+                
+                {/* Progress Bar */}
+                <div className="relative bg-white/20 w-full h-2 rounded-full">
+                  <div 
+                    className={`absolute top-0 left-0 h-full rounded-full transition-all duration-300 ${
+                      stat.color === 'blue' ? 'bg-gradient-to-r from-blue-400 to-blue-500' :
+                      stat.color === 'green' ? 'bg-gradient-to-r from-green-400 to-green-500' :
+                      stat.color === 'purple' ? 'bg-gradient-to-r from-purple-400 to-purple-500' :
+                      'bg-gradient-to-r from-orange-400 to-orange-500'
+                    }`}
+                    style={{ 
+                      width: stat.trend === 'up' ? '76%' : 
+                             stat.trend === 'down' ? '45%' : '60%' 
+                    }}
+                  />
+                </div>
+                
+                {/* Change Text */}
+                <p className={`text-sm mt-2 ${
+                  stat.trend === 'up' ? 'text-green-300' : 
+                  stat.trend === 'down' ? 'text-red-300' : 
+                  'text-white/70'
                 }`}>
                   {stat.change}
-                </span>
+                </p>
               </div>
             </div>
           );
@@ -188,7 +249,7 @@ export function Dashboard() {
                     key={pool.address}
                     className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200"
                   >
-                    {pool.token0Symbol}/{pool.token1Symbol}
+                    {pool.tokenA.symbol}/{pool.tokenB.symbol}
                   </span>
                 ))}
                 {imbalancedPools.length > 3 && (
@@ -207,7 +268,7 @@ export function Dashboard() {
         {/* Pool Overview */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-xl font-bricolage font-semibold text-white">
               Liquidity Pools
             </h2>
             <div className="flex items-center space-x-2">
@@ -263,7 +324,7 @@ export function Dashboard() {
         <div className="space-y-6">
           {/* Recent Activity */}
           <div className="pool-card p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            <h3 className="text-lg font-semibold text-white mb-4">
               Recent Activity
             </h3>
             <RebalanceActivity 
@@ -274,7 +335,7 @@ export function Dashboard() {
 
           {/* Quick Actions */}
           <div className="pool-card p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            <h3 className="text-lg font-semibold text-white mb-4">
               Quick Actions
             </h3>
             <div className="space-y-3">
@@ -292,12 +353,12 @@ export function Dashboard() {
 
           {/* System Status */}
           <div className="pool-card p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            <h3 className="text-lg font-semibold text-white mb-4">
               System Status
             </h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-white/70">
                   Event Listeners
                 </span>
                 <span className="status-badge status-balanced">
@@ -305,7 +366,7 @@ export function Dashboard() {
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-white/70">
                   Auto Rebalancing
                 </span>
                 <span className="status-badge status-balanced">
@@ -313,7 +374,7 @@ export function Dashboard() {
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-white/70">
                   Network
                 </span>
                 <span className="status-badge status-balanced">
@@ -331,9 +392,9 @@ export function Dashboard() {
           <PoolChart
             title="TVL Overview"
             data={pools.map(pool => ({
-              name: `${pool.token0Symbol}/${pool.token1Symbol}`,
+              name: `${pool.tokenA.symbol}/${pool.tokenB.symbol}`,
               value: pool.tvl,
-              ratio: pool.ratio,
+              ratio: pool.currentRatio,
             }))}
             timeframe={selectedTimeframe}
           />
@@ -341,10 +402,10 @@ export function Dashboard() {
           <PoolChart
             title="Pool Ratios"
             data={pools.map(pool => ({
-              name: `${pool.token0Symbol}/${pool.token1Symbol}`,
-              value: pool.ratio,
+              name: `${pool.tokenA.symbol}/${pool.tokenB.symbol}`,
+              value: pool.currentRatio,
               target: pool.targetRatio,
-              imbalanced: pool.isImbalanced,
+              imbalanced: pool.needsRebalancing,
             }))}
             timeframe={selectedTimeframe}
           />

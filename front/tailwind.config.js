@@ -1,12 +1,22 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
+      fontFamily: {
+        // Main headings
+        unbounded: ["var(--font-unbounded)", "sans-serif"],
+        // Sub-headings
+        bricolage: ["Bricolage Grotesque", "sans-serif"],
+        // Normal text
+        "space-grotesk": ["var(--font-space-grotesk)", "sans-serif"],
+        // TAN NIMBUS for headings (will be added via CSS)
+        "tan-nimbus": ["TAN NIMBUS", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -65,4 +75,4 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};
