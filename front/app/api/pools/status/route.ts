@@ -36,24 +36,24 @@ export async function GET(request: NextRequest) {
         // Update pool data
         const updatedPool: Pool = {
           ...pool,
-          reserve0: reserve0.toString(),
-          reserve1: reserve1.toString(),
+          reserveA: reserve0.toString(),
+          reserveB: reserve1.toString(),
           totalSupply: totalSupply.toString(),
-          ratio,
+          currentRatio: ratio,
           tvl,
-          isImbalanced
+          needsRebalancing: isImbalanced
         };
         
         updatedPools.push(updatedPool);
         
         // Update in database
         database.updatePool(pool.address, {
-          reserve0: reserve0.toString(),
-          reserve1: reserve1.toString(),
+          reserveA: reserve0.toString(),
+          reserveB: reserve1.toString(),
           totalSupply: totalSupply.toString(),
-          ratio,
+          currentRatio: ratio,
           tvl,
-          isImbalanced
+          needsRebalancing: isImbalanced
         });
         
         // Add historical data point
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
           timestamp: Date.now(),
           ratio,
           tvl,
-          volume: pool.volume24h,
+          volume: pool.volume24h || 0,
           fees: pool.fees24h
         });
         
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Detect imbalances
-    const imbalancedPools = updatedPools.filter(pool => pool.isImbalanced);
+    const imbalancedPools = updatedPools.filter(pool => pool.needsRebalancing);
     
     // Get dashboard stats
     const dashboardStats = database.getDashboardStats();

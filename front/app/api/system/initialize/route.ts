@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
     
     // Verify contracts are deployed
     try {
-      const factoryCode = await contractService.provider.getCode(addresses.factory);
-      const rebalancerCode = await contractService.provider.getCode(addresses.rebalancerController);
+      const factoryCode = await contractService.getProvider().getCode(addresses.factory);
+      const rebalancerCode = await contractService.getProvider().getCode(addresses.rebalancerController);
       
       if (factoryCode === '0x' || rebalancerCode === '0x') {
         throw new Error('Contracts not deployed at provided addresses');
@@ -57,17 +57,23 @@ export async function POST(request: NextRequest) {
         // Add pool to database
         const pool = {
           address: pair,
-          token0,
-          token1,
-          token0Symbol,
-          token1Symbol,
-          reserve0: reserve0.toString(),
-          reserve1: reserve1.toString(),
+          tokenA: {
+            address: token0,
+            symbol: token0Symbol
+          },
+          tokenB: {
+            address: token1,
+            symbol: token1Symbol
+          },
+          reserveA: reserve0.toString(),
+          reserveB: reserve1.toString(),
           totalSupply: totalSupply.toString(),
-          ratio: parseFloat(contractService.formatUnits(reserve0)) / parseFloat(contractService.formatUnits(reserve1)),
+          currentRatio: parseFloat(contractService.formatUnits(reserve0)) / parseFloat(contractService.formatUnits(reserve1)),
           targetRatio: 1.0, // Default target ratio
-          isImbalanced: false,
+          needsRebalancing: false,
+          isActive: true,
           lastRebalance: 0,
+          rebalanceCount: 0,
           createdAt: Date.now(),
           tvl: 0,
           volume24h: 0,
@@ -165,7 +171,7 @@ export async function GET(request: NextRequest) {
       contractsDeployed: true,
       eventListenersActive: true,
       totalPools: stats.activePools,
-      activeRebalances: stats.rebalancesToday,
+      activeRebalances: stats.imbalancedPools,
       lastUpdate: Date.now(),
       networkId: 31,
       blockNumber: 0 // Would need to fetch from provider

@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       'https://mycrypto.testnet.rsk.co'
     ];
     
-    let workingProvider = null;
+    let workingProvider: any = null;
     let workingRpcUrl = '';
     
     // Find a working RPC endpoint
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
         const network = await Promise.race([
           provider.getNetwork(),
           new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
-        ]);
+        ]) as any;
         
         console.log(`✅ Connected to network: ${network.name} (chainId: ${network.chainId})`);
         workingProvider = provider;
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
     
     const factoryContract = new ethers.Contract(factoryAddress, FACTORY_ABI, workingProvider);
     
-    const testResults = [];
+    const testResults: any[] = [];
     
     // Test basic getter functions that should exist
     const testMethods = [

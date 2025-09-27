@@ -4,6 +4,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { Navigation } from '@/components/Navigation';
 import { Toaster } from '@/components/ui/Toaster';
+import { PageTransition } from '@/components/PageTransition';
 import PatternBackground from '@/components/PatternBackground';
 
 // Primary fonts
@@ -58,10 +59,12 @@ export default function RootLayout({
             <div className="relative z-20">
               <Navigation />
               <main className="pt-16">
-                {children}
+                <PageTransition>
+                  {children}
+                </PageTransition>
               </main>
-              <Toaster />
             </div>
+            <Toaster />
           </div>
         </Providers>
       </body>

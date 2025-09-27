@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const network = await Promise.race([
       provider.getNetwork(),
       new Promise((_, reject) => setTimeout(() => reject(new Error('Network timeout')), 15000))
-    ]);
+    ]) as any;
     
     console.log(`✅ Connected to: ${network.name} (chainId: ${network.chainId})`);
     
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const code = await Promise.race([
       provider.getCode(factoryAddress),
       new Promise((_, reject) => setTimeout(() => reject(new Error('Code check timeout')), 10000))
-    ]);
+    ]) as any;
     
     const hasContract = code !== '0x';
     console.log(`Contract exists: ${hasContract ? '✅ YES' : '❌ NO'}`);

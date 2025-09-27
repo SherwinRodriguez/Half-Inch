@@ -82,7 +82,7 @@ export async function GET(
       } else if (waitForConfirmation) {
         // Wait for confirmation if requested
         try {
-          const confirmedReceipt = await contractService.provider.waitForTransaction(
+          const confirmedReceipt = await contractService.getProvider().waitForTransaction(
             txHash, 
             1, // 1 confirmation
             30000 // 30 second timeout
@@ -207,10 +207,10 @@ async function updatePoolStateAfterRebalance(
     
     // Update pool in database
     database.updatePool(poolAddress, {
-      reserve0: reserve0.toString(),
-      reserve1: reserve1.toString(),
-      ratio: newRatio,
-      isImbalanced
+      reserveA: reserve0.toString(),
+      reserveB: reserve1.toString(),
+      currentRatio: newRatio,
+      needsRebalancing: isImbalanced
     });
     
     // Add historical data point

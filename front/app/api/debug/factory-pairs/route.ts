@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
       throw contractError;
     }
     
-    const pairs = [];
+    const pairs: any[] = [];
     
     // Get all pairs from Factory.allPairs[]
     for (let i = 0; i < allPairsLength; i++) {
@@ -245,7 +245,7 @@ export async function GET(request: NextRequest) {
     if (dbPools.length > 0) {
       console.log('\n📋 Database Pools:');
       dbPools.forEach((pool, index) => {
-        console.log(`   ${index + 1}. ${pool.token0Symbol} / ${pool.token1Symbol} (${pool.address})`);
+        console.log(`   ${index + 1}. ${pool.tokenA.symbol} / ${pool.tokenB.symbol} (${pool.address})`);
       });
     } else {
       console.log('   ⚠️  No pools found in database!');

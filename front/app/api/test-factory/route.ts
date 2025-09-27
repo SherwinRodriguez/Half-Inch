@@ -16,17 +16,16 @@ export async function GET(request: NextRequest) {
       { name: 'MyCrypto', url: 'https://mycrypto.testnet.rsk.co' }
     ];
     
-    const results = [];
+    const results: any[] = [];
     
     for (const endpoint of rpcEndpoints) {
       console.log(`\n🔄 Testing ${endpoint.name}: ${endpoint.url}`);
       
+      const startTime = Date.now();
+      
       try {
         // Create contract service with timeout
         const contractService = new ContractService(endpoint.url);
-        
-        // Test with timeout
-        const startTime = Date.now();
         
         const factoryContract = await contractService.getFactoryContract(factoryAddress);
         

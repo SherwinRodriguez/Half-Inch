@@ -41,7 +41,7 @@ export async function POST(
     // Calculate required swap amounts
     let swapAmount0 = '0';
     let swapAmount1 = '0';
-    let route: string[] = [pool.token0, pool.token1];
+    let route: string[] = [pool.tokenA.address, pool.tokenB.address];
     
     if (Math.abs(currentRatio - finalTargetRatio) > 0.001) { // Only if significant imbalance
       if (currentRatio > finalTargetRatio) {
@@ -49,13 +49,13 @@ export async function POST(
         const excessRatio = currentRatio - finalTargetRatio;
         const reserve0Float = parseFloat(contractService.formatUnits(reserve0));
         swapAmount0 = contractService.parseUnits((excessRatio * reserve0Float * 0.5).toString()).toString();
-        route = [pool.token0, pool.token1];
+        route = [pool.tokenA.address, pool.tokenB.address];
       } else {
         // Need to sell token1 for token0
         const deficitRatio = finalTargetRatio - currentRatio;
         const reserve1Float = parseFloat(contractService.formatUnits(reserve1));
         swapAmount1 = contractService.parseUnits((deficitRatio * reserve1Float * 0.5).toString()).toString();
-        route = [pool.token1, pool.token0];
+        route = [pool.tokenB.address, pool.tokenA.address];
       }
     }
     
@@ -160,7 +160,7 @@ export async function GET(
     
     // Quick estimate without blockchain calls
     const finalTargetRatio = targetRatio || pool.targetRatio;
-    const currentRatio = pool.ratio;
+    const currentRatio = pool.currentRatio;
     
     const quickEstimate = {
       poolAddress: address,

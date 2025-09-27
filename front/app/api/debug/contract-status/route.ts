@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     });
     
     // Check Router configuration if it exists
-    let routerConfig = null;
+    let routerConfig: any = null;
     if (status.router.exists) {
       try {
         const routerContract = await contractService.getRouterContract();
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
     console.log(`Can add liquidity: ${canAddLiquidity ? '✅' : '❌'}`);
     
     // Recommendations
-    const recommendations = [];
+    const recommendations: string[] = [];
     if (!status.factory.exists) {
       recommendations.push('Deploy Factory contract');
     }

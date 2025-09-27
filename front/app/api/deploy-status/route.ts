@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       'https://mycrypto.testnet.rsk.co'
     ];
     
-    let workingProvider = null;
+    let workingProvider: any = null;
     let workingRpcUrl = '';
     
     for (const rpcUrl of rpcEndpoints) {
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
         const network = await Promise.race([
           provider.getNetwork(),
           new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
-        ]);
+        ]) as any;
         
         console.log(`✅ Connected to ${network.name} (chainId: ${network.chainId})`);
         workingProvider = provider;
@@ -114,27 +114,27 @@ export async function GET(request: NextRequest) {
     
     // Summary
     console.log('\n📊 DEPLOYMENT SUMMARY:');
-    const deployed = Object.values(deploymentStatus).filter(s => s.deployed).length;
-    const configured = Object.values(deploymentStatus).filter(s => s.configured).length;
+    const deployed = Object.values(deploymentStatus).filter((s: any) => s.deployed).length;
+    const configured = Object.values(deploymentStatus).filter((s: any) => s.configured).length;
     const total = Object.keys(contracts).length;
     
     console.log(`   Deployed: ${deployed}/${total}`);
     console.log(`   Configured: ${configured}/${total}`);
     console.log(`   Missing: ${total - deployed}`);
     
-    const deployedContracts = Object.entries(deploymentStatus).filter(([_, status]) => status.deployed);
-    const missingContracts = Object.entries(deploymentStatus).filter(([_, status]) => !status.deployed);
+    const deployedContracts = Object.entries(deploymentStatus).filter(([_, status]: any) => status.deployed);
+    const missingContracts = Object.entries(deploymentStatus).filter(([_, status]: any) => !status.deployed);
     
     if (deployedContracts.length > 0) {
       console.log('\n✅ Deployed contracts:');
-      deployedContracts.forEach(([name, status]) => {
+      deployedContracts.forEach(([name, status]: any) => {
         console.log(`   - ${name.toUpperCase()}: ${status.address}`);
       });
     }
     
     if (missingContracts.length > 0) {
       console.log('\n❌ Missing contracts:');
-      missingContracts.forEach(([name, status]) => {
+      missingContracts.forEach(([name, status]: any) => {
         console.log(`   - ${name.toUpperCase()}: ${status.error}`);
       });
     }

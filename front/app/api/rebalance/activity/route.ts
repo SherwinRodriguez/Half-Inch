@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const poolAddress = searchParams.get('pool');
     
     // Get rebalance events
-    let events = database.getRebalanceEvents(poolAddress);
+    let events = database.getRebalanceEvents(poolAddress || undefined);
     
     // Sort by timestamp (newest first)
     events = events.sort((a, b) => b.timestamp - a.timestamp);

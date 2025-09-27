@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
       data: {
         pools: discoveredPools,
         totalDiscovered: discoveredPools.length,
-        imbalancedCount: discoveredPools.filter(p => p.isImbalanced).length
+        imbalancedCount: discoveredPools.filter(p => p.needsRebalancing).length
       },
       timestamp: Date.now()
     };

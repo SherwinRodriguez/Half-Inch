@@ -233,18 +233,6 @@ export default function PoolDetailPage() {
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {formatCurrency(pool.volume24h || 0)}
               </p>
-              {metrics?.volumeChange24h !== undefined && (
-                <div className={`flex items-center space-x-1 text-xs mt-1 ${
-                  metrics.volumeChange24h >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {metrics.volumeChange24h >= 0 ? (
-                    <TrendingUp className="w-3 h-3" />
-                  ) : (
-                    <TrendingDown className="w-3 h-3" />
-                  )}
-                  <span>{formatPercentage(Math.abs(metrics.volumeChange24h))}</span>
-                </div>
-              )}
             </div>
             <BarChart3 className="w-8 h-8 text-green-500" />
           </div>
@@ -257,18 +245,6 @@ export default function PoolDetailPage() {
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {formatPercentage(pool.apy || 0)}
               </p>
-              {metrics?.apyChange24h !== undefined && (
-                <div className={`flex items-center space-x-1 text-xs mt-1 ${
-                  metrics.apyChange24h >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {metrics.apyChange24h >= 0 ? (
-                    <TrendingUp className="w-3 h-3" />
-                  ) : (
-                    <TrendingDown className="w-3 h-3" />
-                  )}
-                  <span>{formatPercentage(Math.abs(metrics.apyChange24h))}</span>
-                </div>
-              )}
             </div>
             <TrendingUp className="w-8 h-8 text-orange-500" />
           </div>
@@ -325,10 +301,9 @@ export default function PoolDetailPage() {
           </div>
         ) : (
           <PoolChart 
+            title="Pool Performance"
             data={metrics.historicalData || []} 
             timeframe={timeframe}
-            tokenA={pool.tokenA.symbol}
-            tokenB={pool.tokenB.symbol}
           />
         )}
       </div>
@@ -440,16 +415,16 @@ export default function PoolDetailPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Total Fees Earned</span>
                   <span className="font-medium text-gray-900 dark:text-gray-100">
-                    {formatCurrency(metrics.totalFeesEarned || 0)}
+                    {formatCurrency(metrics.performance?.totalFees || 0)}
                   </span>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Impermanent Loss</span>
                   <span className={`font-medium ${
-                    (metrics.impermanentLoss || 0) < 0 ? 'text-red-600' : 'text-gray-900 dark:text-gray-100'
+                    (metrics.performance?.impermanentLoss || 0) < 0 ? 'text-red-600' : 'text-gray-900 dark:text-gray-100'
                   }`}>
-                    {formatPercentage(metrics.impermanentLoss || 0)}
+                    {formatPercentage(metrics.performance?.impermanentLoss || 0)}
                   </span>
                 </div>
               </>

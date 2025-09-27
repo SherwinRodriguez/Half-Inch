@@ -250,12 +250,12 @@ class InMemoryDatabase {
     this.poolMetrics.clear();
     this.rebalanceEvents = [];
     this.dashboardStats = {
-      totalValueLocked: 0,
+      totalTVL: 0,
       totalVolume24h: 0,
-      totalFees24h: 0,
+      averageAPY: 0,
+      totalPools: 0,
       activePools: 0,
-      rebalancesToday: 0,
-      avgApy: 0,
+      imbalancedPools: 0
     };
   }
 }

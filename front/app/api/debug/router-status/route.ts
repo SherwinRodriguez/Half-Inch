@@ -31,8 +31,8 @@ export async function GET(request: NextRequest) {
     console.log('Factory Contract Exists:', factoryExists);
     console.log('Router Contract Exists:', routerExists);
     
-    let factoryInfo = null;
-    let routerInfo = null;
+    let factoryInfo: any = null;
+    let routerInfo: any = null;
     
     // If Router exists, check its configuration
     if (routerExists) {
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Overall diagnosis
-    let diagnosis = [];
+    let diagnosis: string[] = [];
     let canAddLiquidity = false;
     
     if (!factoryExists) {

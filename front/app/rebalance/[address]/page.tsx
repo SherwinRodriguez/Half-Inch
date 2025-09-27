@@ -152,7 +152,7 @@ export default function RebalancePage() {
     );
   }
 
-  const ratioDeviation = Math.abs(pool.ratio - pool.targetRatio) / pool.targetRatio * 100;
+  const ratioDeviation = Math.abs(pool.currentRatio - pool.targetRatio) / pool.targetRatio * 100;
   const isSignificantImbalance = ratioDeviation > 5;
 
   return (
@@ -164,18 +164,18 @@ export default function RebalancePage() {
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
                 <span className="text-blue-600 dark:text-blue-400 font-medium">
-                  {pool.token0Symbol.charAt(0)}
+                  {pool.tokenA.symbol.charAt(0)}
                 </span>
               </div>
               <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center -ml-2">
                 <span className="text-purple-600 dark:text-purple-400 font-medium">
-                  {pool.token1Symbol.charAt(0)}
+                  {pool.tokenB.symbol.charAt(0)}
                 </span>
               </div>
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                Rebalance {pool.token0Symbol}/{pool.token1Symbol}
+                Rebalance {pool.tokenA.symbol}/{pool.tokenB.symbol}
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
                 {truncateAddress(pool.address)}
@@ -184,7 +184,7 @@ export default function RebalancePage() {
           </div>
 
           {/* Status Alert */}
-          {pool.isImbalanced ? (
+          {pool.needsRebalancing ? (
             <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-800 rounded-lg p-4">
               <div className="flex items-center space-x-2">
                 <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -273,7 +273,7 @@ export default function RebalancePage() {
                       min="0.0001"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Current ratio: {pool.ratio.toFixed(4)}
+                      Current ratio: {pool.currentRatio.toFixed(4)}
                     </p>
                   </div>
 
@@ -529,11 +529,11 @@ export default function RebalancePage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">24h Volume</span>
-                  <span className="font-medium">{formatCurrency(pool.volume24h)}</span>
+                  <span className="font-medium">{formatCurrency(pool.volume24h || 0)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">APY</span>
-                  <span className="font-medium">{formatPercentage(pool.apy)}</span>
+                  <span className="font-medium">{formatPercentage(pool.apy || 0)}</span>
                 </div>
               </div>
             </div>
@@ -545,12 +545,12 @@ export default function RebalancePage() {
               </h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">{pool.token0Symbol}</span>
-                  <span className="font-medium">{formatTokenAmount(pool.reserve0)}</span>
+                  <span className="text-gray-600 dark:text-gray-400">{pool.tokenA.symbol}</span>
+                  <span className="font-medium">{formatTokenAmount(pool.reserveA)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">{pool.token1Symbol}</span>
-                  <span className="font-medium">{formatTokenAmount(pool.reserve1)}</span>
+                  <span className="text-gray-600 dark:text-gray-400">{pool.tokenB.symbol}</span>
+                  <span className="font-medium">{formatTokenAmount(pool.reserveB)}</span>
                 </div>
               </div>
             </div>

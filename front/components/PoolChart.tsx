@@ -45,14 +45,13 @@ export function PoolChart({ title, data, timeframe, type = 'bar' }: PoolChartPro
           tick={{ fontSize: 12 }}
         />
         <YAxis className="text-gray-600 dark:text-gray-400" tick={{ fontSize: 12 }} />
-        <Tooltip
+        <Tooltip 
           contentStyle={{
             backgroundColor: 'rgb(255 255 255 / 0.95)',
             border: '1px solid rgb(229 231 235)',
             borderRadius: '8px',
             fontSize: '12px',
           }}
-          className="dark:bg-gray-800 dark:border-gray-700"
         />
         <Legend />
         <Bar 

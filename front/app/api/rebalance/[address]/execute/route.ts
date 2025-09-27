@@ -189,7 +189,7 @@ async function monitorTransaction(
     console.log(`Monitoring transaction: ${txHash}`);
     
     // Wait for transaction confirmation
-    const receipt = await contractService.provider.waitForTransaction(txHash);
+    const receipt = await contractService.getProvider().waitForTransaction(txHash);
     
     if (!receipt) {
       throw new Error('Transaction receipt not found');
@@ -218,10 +218,10 @@ async function monitorTransaction(
                       parseFloat(contractService.formatUnits(reserve1));
       
       database.updatePool(poolAddress, {
-        reserve0: reserve0.toString(),
-        reserve1: reserve1.toString(),
-        ratio: newRatio,
-        isImbalanced: false // Assume rebalance was successful
+        reserveA: reserve0.toString(),
+        reserveB: reserve1.toString(),
+        currentRatio: newRatio,
+        needsRebalancing: false // Assume rebalance was successful
       });
       
       updates.toRatio = newRatio;

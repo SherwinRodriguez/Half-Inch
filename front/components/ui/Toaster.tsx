@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export interface Toast {
@@ -77,19 +78,19 @@ export function Toaster({ position = 'top-right' }: ToasterProps) {
   }, []);
 
   const positionClasses = {
-    'top-right': 'top-4 right-4',
-    'top-left': 'top-4 left-4',
-    'bottom-right': 'bottom-4 right-4',
-    'bottom-left': 'bottom-4 left-4',
+    'top-right': 'top-4 right-2 md:right-4',
+    'top-left': 'top-4 left-2 md:left-4',
+    'bottom-right': 'bottom-2 right-2 md:right-4',
+    'bottom-left': 'bottom-2 left-2 md:left-4',
   };
 
-  if (currentToasts.length === 0) return null;
-
   return (
-    <div className={cn('fixed z-50 flex flex-col space-y-2', positionClasses[position])}>
-      {currentToasts.map((toast) => (
-        <ToastItem key={toast.id} toast={toast} onDismiss={() => removeToast(toast.id)} />
-      ))}
+    <div className={cn('fixed z-[60] flex flex-col space-y-2', positionClasses[position])}>
+      <AnimatePresence mode="popLayout">
+        {currentToasts.map((toast) => (
+          <ToastItem key={toast.id} toast={toast} onDismiss={() => removeToast(toast.id)} />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
@@ -100,20 +101,6 @@ interface ToastItemProps {
 }
 
 function ToastItem({ toast, onDismiss }: ToastItemProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isExiting, setIsExiting] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  const handleDismiss = () => {
-    setIsExiting(true);
-    setTimeout(() => {
-      onDismiss();
-    }, 150);
-  };
-
   const icons = {
     success: CheckCircle,
     error: AlertCircle,
@@ -138,36 +125,66 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
   };
 
   return (
-    <div
+    <motion.div
+      layout
+      initial={{ opacity: 0, x: 300, scale: 0.3 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: 300, scale: 0.5, transition: { duration: 0.2 } }}
+      transition={{ 
+        type: "spring", 
+        stiffness: 500, 
+        damping: 30,
+        mass: 1
+      }}
       className={cn(
-        'max-w-sm w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg pointer-events-auto border transition-all duration-300 ease-in-out transform',
-        typeClasses[toast.type],
-        isVisible && !isExiting ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0',
-        isExiting && '-translate-x-full opacity-0'
+        'max-w-md w-full min-h-[120px] bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-lg rounded-lg pointer-events-auto border',
+        typeClasses[toast.type]
       )}
     >
-      <div className="p-4">
+      <div className="p-6">
         <div className="flex items-start">
-          <div className="flex-shrink-0">
+          <motion.div 
+            className="flex-shrink-0"
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.1, type: "spring", stiffness: 400 }}
+          >
             <Icon className={cn('w-5 h-5', iconColors[toast.type])} />
-          </div>
-          <div className="ml-3 w-0 flex-1">
-            <p className="text-sm font-medium">{toast.title}</p>
+          </motion.div>
+          <div className="ml-3 flex-1 min-w-0">
+            <motion.p 
+              className="text-sm font-medium break-words"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+            >
+              {toast.title}
+            </motion.p>
             {toast.message && (
-              <p className="mt-1 text-sm opacity-90">{toast.message}</p>
+              <motion.p 
+                className="mt-1 text-sm opacity-90 break-words"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                {toast.message}
+              </motion.p>
             )}
           </div>
           <div className="ml-4 flex-shrink-0 flex">
-            <button
-              onClick={handleDismiss}
-              className="inline-flex rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-gray-400 opacity-70 hover:opacity-100 transition-opacity"
+            <motion.button
+              onClick={onDismiss}
+              className="inline-flex rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-gray-400 opacity-70 hover:opacity-100"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
               <span className="sr-only">Close</span>
               <X className="w-4 h-4" />
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
