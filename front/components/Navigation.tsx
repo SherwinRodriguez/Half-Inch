@@ -15,7 +15,9 @@ import {
   X,
   Activity,
   Layers,
-  Zap
+  Zap,
+  ArrowLeftRight,
+  Coins
 } from 'lucide-react';
 import { WalletConnect } from './WalletConnect';
 
@@ -26,6 +28,8 @@ export function Navigation() {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+    { name: 'Trade', href: '/trade', icon: ArrowLeftRight },
+    { name: 'Tokens', href: '/tokens', icon: Coins },
     { name: 'Pools', href: '/pools', icon: Layers },
     { name: 'Create Pool', href: '/create-pool', icon: Plus },
     { name: 'Rebalancing', href: '/rebalance', icon: Zap },
