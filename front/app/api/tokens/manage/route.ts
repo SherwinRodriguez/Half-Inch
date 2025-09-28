@@ -9,7 +9,8 @@ export async function GET(request: NextRequest) {
 
     switch (action) {
       case 'local-tokens':
-        return await getLocalTokens();
+        const localTokens = await getLocalTokens();
+        return NextResponse.json(localTokens);
       
       case 'cross-chain-mappings':
         const localToken = searchParams.get('localToken');
@@ -19,7 +20,8 @@ export async function GET(request: NextRequest) {
         return await getCrossChainMappings(localToken);
       
       case 'supported-tokens':
-        return await getSupportedTokens();
+        const supportedTokens = await getSupportedTokens();
+        return NextResponse.json(supportedTokens);
       
       case 'tokens-by-chain':
         const chainId = searchParams.get('chainId');
@@ -117,12 +119,12 @@ async function getLocalTokens() {
       }
     ];
 
-    return NextResponse.json({
+    return {
       success: true,
       data: mockTokens,
       count: mockTokens.length,
       timestamp: Date.now()
-    });
+    };
   } catch (error) {
     throw new Error('Failed to fetch local tokens');
   }
@@ -161,7 +163,7 @@ async function getSupportedTokens() {
       oneInchIntegration.getAllTokens()
     ]);
 
-    return NextResponse.json({
+    return {
       success: true,
       data: {
         local: localTokens.data,
@@ -169,7 +171,7 @@ async function getSupportedTokens() {
         total: localTokens.count + oneInchTokens.length
       },
       timestamp: Date.now()
-    });
+    };
   } catch (error) {
     throw new Error('Failed to fetch supported tokens');
   }

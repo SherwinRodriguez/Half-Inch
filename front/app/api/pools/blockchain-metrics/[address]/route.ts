@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ContractService, DEFAULT_ADDRESSES } from '@/lib/contracts';
-import { Pool, ApiResponse } from '@/lib/types';
+import { Pool, ApiResponse, RebalanceEvent } from '@/lib/types';
 
 export async function GET(
   request: NextRequest,
@@ -82,8 +82,14 @@ export async function GET(
     
     // Generate mock historical data for demonstration
     const now = Date.now();
-    const historicalData = [];
-    const rebalanceHistory = [];
+    const historicalData: {
+      timestamp: number;
+      ratio: number;
+      tvl: number;
+      volume: number;
+      fees: number;
+    }[] = [];
+    const rebalanceHistory: RebalanceEvent[] = [];
     
     // Create some sample historical data points
     for (let i = 23; i >= 0; i--) {

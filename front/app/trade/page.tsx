@@ -15,7 +15,8 @@ import {
   RefreshCw,
   Settings
 } from 'lucide-react';
-import { oneInchIntegration, TokenInfo, formatTokenAmount } from '@/lib/1inch-integration';
+import { oneInchIntegration, TokenInfo } from '@/lib/1inch-integration';
+import { formatTokenAmount } from '@/lib/utils';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { toast } from '@/components/ui/Toaster';
 import { useWallet } from '@/contexts/WalletContext';

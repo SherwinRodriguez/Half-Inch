@@ -55,41 +55,40 @@ export async function GET(request: NextRequest) {
         
         // If we get a successful connection, try to get first pair details
         try {
-            console.log(`   🔍 Getting first pair details...`);
-            const firstPairAddress = await Promise.race([
-              factoryContract.allPairs(0),
-              new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Timeout getting pair')), 10000)
-              )
-            ]);
-            
-            console.log(`   First pair address: ${firstPairAddress}`);
-            
-            results[results.length - 1].firstPairAddress = firstPairAddress;
-            
-            // Try to get pair contract details
-            const pairContract = await contractService.getPairContract(firstPairAddress);
-            const [token0, token1] = await Promise.all([
-              Promise.race([
-                pairContract.token0(),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
-              ]),
-              Promise.race([
-                pairContract.token1(),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
-              ])
-            ]);
-            
-            console.log(`   Token0: ${token0}`);
-            console.log(`   Token1: ${token1}`);
-            
-            results[results.length - 1].token0 = token0;
-            results[results.length - 1].token1 = token1;
-            
-          } catch (pairError) {
-            console.log(`   ⚠️  Could not get pair details: ${pairError.message}`);
-            results[results.length - 1].pairError = pairError.message;
-          }
+          console.log(`   🔍 Getting first pair details...`);
+          const firstPairAddress = await Promise.race([
+            factoryContract.allPairs(0),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Timeout getting pair')), 10000)
+            )
+          ]);
+          
+          console.log(`   First pair address: ${firstPairAddress}`);
+          
+          results[results.length - 1].firstPairAddress = firstPairAddress;
+          
+          // Try to get pair contract details
+          const pairContract = await contractService.getPairContract(firstPairAddress);
+          const [token0, token1] = await Promise.all([
+            Promise.race([
+              pairContract.token0(),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+            ]),
+            Promise.race([
+              pairContract.token1(),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+            ])
+          ]);
+          
+          console.log(`   Token0: ${token0}`);
+          console.log(`   Token1: ${token1}`);
+          
+          results[results.length - 1].token0 = token0;
+          results[results.length - 1].token1 = token1;
+          
+        } catch (pairError) {
+          console.log(`   ⚠️  Could not get pair details: ${pairError.message}`);
+          results[results.length - 1].pairError = pairError.message;
         }
         
       } catch (error) {

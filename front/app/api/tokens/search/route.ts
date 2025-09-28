@@ -105,7 +105,12 @@ function generateMockTokens(query: string, chainId: string, limit: number) {
   );
 
   // Add some dynamic tokens based on query
-  const dynamicTokens = [];
+  const dynamicTokens: {
+    symbol: string;
+    name: string;
+    address: string;
+    verified: boolean;
+  }[] = [];
   for (let i = 0; i < Math.min(3, limit - filteredTokens.length); i++) {
     const queryUpper = query.toUpperCase();
     dynamicTokens.push({

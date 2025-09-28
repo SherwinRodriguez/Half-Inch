@@ -16,22 +16,23 @@ export async function GET(request: NextRequest) {
       'https://mycrypto.testnet.rsk.co'
     ];
     
-    let contractService: ContractService;
+    let contractService: ContractService | null = null;
     let workingRpcUrl = '';
     
     // Try to connect to RPC
     for (const rpcUrl of rpcEndpoints) {
       try {
         console.log(`🔄 Trying RPC: ${rpcUrl}`);
-        contractService = new ContractService(rpcUrl);
+        const testContractService = new ContractService(rpcUrl);
         
         // Test the connection with a simple call
-        const testFactory = await contractService.getFactoryContract(factoryAddress);
+        const testFactory = await testContractService.getFactoryContract(factoryAddress);
         const testCall = await Promise.race([
           testFactory.feeTo(),
           new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
         ]);
         
+        contractService = testContractService;
         workingRpcUrl = rpcUrl;
         console.log(`✅ Successfully connected to: ${rpcUrl}`);
         break;
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    if (!workingRpcUrl) {
+    if (!contractService || !workingRpcUrl) {
       throw new Error('Could not connect to any RPC endpoint');
     }
     
